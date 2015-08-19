@@ -33,7 +33,7 @@ $string['dnduploadpredefinedlabels'] = 'Add image to course page';
 $string['dnduploadpredefinedlabelstext'] = 'Add a predefinedlabels to the course page';
 $string['predefinedlabels:addinstance'] = 'Add a new predefinedlabels';
 $string['predefinedlabelstext'] = 'Label text';
-$string['modulename'] = 'Label';
+$string['modulename'] = 'Predefined Label';
 $string['modulename_help'] = 'The predefinedlabels module enables text and multimedia to be inserted into the course page in between links to other resources and activities. Labels are very versatile and can help to improve the appearance of a course if used thoughtfully.
 
 Labels may be used
@@ -42,6 +42,16 @@ Labels may be used
 * To display an embedded sound file or video directly on the course page
 * To add a short description to a course section';
 $string['modulename_link'] = 'mod/predefinedlabels/view';
-$string['modulenameplural'] = 'Labels';
-$string['pluginadministration'] = 'Label administration';
-$string['pluginname'] = 'Label';
+$string['modulenameplural'] = 'Predefined Labels';
+$string['pluginadministration'] = 'Predefined Label administration';
+$string['pluginname'] = 'Predefined Label';
+
+$string['manage_templates'] = 'Manage Templates';
+$string['settings_templates_header'] = 'Manage Templates - Heading';
+$string['settings_templates_header_information'] = 'Manage Templates - Information Text';
+$string['plugin_settings'] = 'Plugin Settings';
+$string['no_templates'] = 'No templates to show';
+$string['add_template'] = 'Add new template';
+$string['templates'] = 'Templates:';
+$string['available'] = 'Available?';
+$string['title'] = 'Title:';
