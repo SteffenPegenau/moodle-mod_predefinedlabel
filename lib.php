@@ -82,13 +82,14 @@ function predefinedlabels_add_instance($predefinedlabels) {
  */
 function predefinedlabels_update_instance($predefinedlabels) {
     global $DB;
-
-    $predefinedlabels->name = get_predefinedlabels_name($predefinedlabels);
-    $predefinedlabels->timemodified = time();
     
-    $predefinedlabels->id = $predefinedlabels->instance;
-
-    return $DB->update_record("predefinedlabels", $predefinedlabels);
+    $data = new stdClass();
+    $data->id = $predefinedlabels->instance;
+    $data->course = $predefinedlabels->course;
+    $data->timemodified = time();
+    $data->templateid = (int) $predefinedlabels->radioar['yesno'];
+    
+    return $DB->update_record("predefinedlabels", $data);
 }
 
 /**

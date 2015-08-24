@@ -117,6 +117,13 @@ function changeTemplate($data) {
     $updatedData->userid = $USER->id;
     $updatedData->available = $data['available' . $id];
     $DB->update_record("predefinedlabels_templates", $updatedData);
+    
+    // Rebuild course cache for all courses that use this template
+    $courses = $DB->get_records('predefinedlabels', array("templateid" => $id), null, 'course');
+    
+    foreach ($courses as $courseid => $course) {
+        rebuild_course_cache($courseid);
+    }
 }
 
 function deleteTemplate($data) {
