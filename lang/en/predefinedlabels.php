@@ -55,3 +55,5 @@ $string['add_template'] = 'Add new template';
 $string['templates'] = 'Templates:';
 $string['available'] = 'Available?';
 $string['title'] = 'Title:';
+$string['timecreated'] = 'Created:';
+$string['please_chose_template'] = 'Please choose a template';

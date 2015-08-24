@@ -22,26 +22,43 @@
  * @copyright  2006 Jamie Pratt
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 defined('MOODLE_INTERNAL') || die;
 
-require_once ($CFG->dirroot.'/course/moodleform_mod.php');
+require_once ($CFG->dirroot . '/course/moodleform_mod.php');
 
 class mod_predefinedlabels_mod_form extends moodleform_mod {
 
     function definition() {
+        GLOBAL $DB;
 
         $mform = $this->_form;
 
-        $mform->addElement('header', 'generalhdr', get_string('general'));
-        $this->standard_intro_elements(get_string('predefinedlabelstext', 'predefinedlabels'));
+        $templates = $DB->get_records('predefinedlabels_templates', array('available' => 1));
+        if (count($templates) == 0) {
+            $mform->addElement('static', 'error_no_templates', get_string('error'), get_string('error_no_templates', 'mod_predefinedlabels'));
+            return;
+        } else {
+            // Prepare templates for select box
+        }
 
+        $mform->addElement('header', 'generalhdr', get_string('please_chose_template', 'mod_predefinedlabels'));
+
+        $attributes = array();
+        $radioarray = array();
+        
+        foreach ($templates as $id => $template) {
+            $entry = $template->title."<br />".$template->body;
+            $radioarray[] = & $mform->createElement('radio', 'yesno', '', $entry, $template->id, $attributes);
+        }
+        $mform->addGroup($radioarray, 'radioar', '', '<br />', true);
+        /*
+          $this->standard_intro_elements(get_string('predefinedlabelstext', 'predefinedlabels'));
+         */
         $this->standard_coursemodule_elements();
 
 //-------------------------------------------------------------------------------
 // buttons
         $this->add_action_buttons(true, false, null);
-
     }
 
 }

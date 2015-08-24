@@ -26,7 +26,7 @@
 defined('MOODLE_INTERNAL') || die;
 
 /** LABEL_MAX_NAME_LENGTH = 50 */
-define("LABEL_MAX_NAME_LENGTH", 50);
+define("PREDEFINEDLABELS_MAX_NAME_LENGTH", 50);
 
 /**
  * @uses LABEL_MAX_NAME_LENGTH
@@ -34,6 +34,7 @@ define("LABEL_MAX_NAME_LENGTH", 50);
  * @return string
  */
 function get_predefinedlabels_name($predefinedlabels) {
+    /*
     $name = strip_tags(format_string($predefinedlabels->intro,true));
     if (core_text::strlen($name) > LABEL_MAX_NAME_LENGTH) {
         $name = core_text::substr($name, 0, LABEL_MAX_NAME_LENGTH)."...";
@@ -43,8 +44,10 @@ function get_predefinedlabels_name($predefinedlabels) {
         // arbitrary name
         $name = get_string('modulename','predefinedlabels');
     }
-
+    
     return $name;
+     */
+    return "PSEUDONAME!";
 }
 /**
  * Given an object containing all the necessary data,
@@ -58,11 +61,14 @@ function get_predefinedlabels_name($predefinedlabels) {
  */
 function predefinedlabels_add_instance($predefinedlabels) {
     global $DB;
-
-    $predefinedlabels->name = get_predefinedlabels_name($predefinedlabels);
-    $predefinedlabels->timemodified = time();
-
-    return $DB->insert_record("predefinedlabels", $predefinedlabels);
+    //echo "<pre>".print_r($predefinedlabels, true)."</pre>";
+    
+    $data = new stdClass();
+    $data->course = $predefinedlabels->course;
+    $data->timemodified = time();
+    $data->templateid = (int) $predefinedlabels->radioar['yesno'];
+    
+    return $DB->insert_record("predefinedlabels", $data);
 }
 
 /**
@@ -79,6 +85,7 @@ function predefinedlabels_update_instance($predefinedlabels) {
 
     $predefinedlabels->name = get_predefinedlabels_name($predefinedlabels);
     $predefinedlabels->timemodified = time();
+    
     $predefinedlabels->id = $predefinedlabels->instance;
 
     return $DB->update_record("predefinedlabels", $predefinedlabels);
@@ -121,8 +128,20 @@ function predefinedlabels_delete_instance($id) {
  */
 function predefinedlabels_get_coursemodule_info($coursemodule) {
     global $DB;
-
-    if ($predefinedlabels = $DB->get_record('predefinedlabels', array('id'=>$coursemodule->instance), 'id, name, intro, introformat')) {
+    
+    if ($predefinedlabel = $DB->get_record('predefinedlabels', array('id'=>$coursemodule->instance))) {
+        $template = $DB->get_record('predefinedlabels_templates', array('id' => $predefinedlabel->templateid));
+        $info = new cached_cm_info();
+        //$info->content = format_module_intro('predefinedlabels', $predefinedlabels, $coursemodule->id, false);
+        $info->content = $template->body;
+        $info->name  = $template->title;
+        return $info;
+    } else {
+        return null;
+    }
+    
+    /*
+    if ($predefinedlabels = $DB->get_record('predefinedlabels', array('id'=>$coursemodule->instance), 'id, name, templateid')) {
         if (empty($predefinedlabels->name)) {
             // predefinedlabels name missing, fix it
             $predefinedlabels->name = "predefinedlabels{$predefinedlabels->id}";
@@ -136,6 +155,10 @@ function predefinedlabels_get_coursemodule_info($coursemodule) {
     } else {
         return null;
     }
+     
+    return null;
+     * 
+     */
 }
 
 /**
