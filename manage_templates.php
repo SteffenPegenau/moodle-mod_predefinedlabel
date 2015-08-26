@@ -63,14 +63,16 @@ if (count($templates) == 0) {
     // DISPLAY EXISTING TEMPLATES
     //printArray($templates);
     foreach ($templates as $template) {
+        echo "<hr />";
         displayChangeTemplateForm($template);
     }
 }
 
 
-
+echo "<hr />";
+echo "<h1>" . get_string('add_template', 'mod_predefinedlabels') . "</h1>";
+echo "<hr />";
 // FORM TO ADD TEMPLATE
-echo "<h3>" . get_string('add_template', 'mod_predefinedlabels') . "</h3>";
 
 
 
