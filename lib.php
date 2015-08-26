@@ -22,7 +22,6 @@
  * @copyright  1999 onwards Martin Dougiamas  {@link http://moodle.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 defined('MOODLE_INTERNAL') || die;
 
 /** LABEL_MAX_NAME_LENGTH = 50 */
@@ -35,20 +34,21 @@ define("PREDEFINEDLABELS_MAX_NAME_LENGTH", 50);
  */
 function get_predefinedlabels_name($predefinedlabels) {
     /*
-    $name = strip_tags(format_string($predefinedlabels->intro,true));
-    if (core_text::strlen($name) > LABEL_MAX_NAME_LENGTH) {
-        $name = core_text::substr($name, 0, LABEL_MAX_NAME_LENGTH)."...";
-    }
+      $name = strip_tags(format_string($predefinedlabels->intro,true));
+      if (core_text::strlen($name) > LABEL_MAX_NAME_LENGTH) {
+      $name = core_text::substr($name, 0, LABEL_MAX_NAME_LENGTH)."...";
+      }
 
-    if (empty($name)) {
-        // arbitrary name
-        $name = get_string('modulename','predefinedlabels');
-    }
-    
-    return $name;
+      if (empty($name)) {
+      // arbitrary name
+      $name = get_string('modulename','predefinedlabels');
+      }
+
+      return $name;
      */
     return "PSEUDONAME!";
 }
+
 /**
  * Given an object containing all the necessary data,
  * (defined by the form in mod_form.php) this function
@@ -62,12 +62,12 @@ function get_predefinedlabels_name($predefinedlabels) {
 function predefinedlabels_add_instance($predefinedlabels) {
     global $DB;
     //echo "<pre>".print_r($predefinedlabels, true)."</pre>";
-    
+
     $data = new stdClass();
     $data->course = $predefinedlabels->course;
     $data->timemodified = time();
     $data->templateid = (int) $predefinedlabels->radioar['yesno'];
-    
+
     return $DB->insert_record("predefinedlabels", $data);
 }
 
@@ -82,13 +82,13 @@ function predefinedlabels_add_instance($predefinedlabels) {
  */
 function predefinedlabels_update_instance($predefinedlabels) {
     global $DB;
-    
+
     $data = new stdClass();
     $data->id = $predefinedlabels->instance;
     $data->course = $predefinedlabels->course;
     $data->timemodified = time();
     $data->templateid = (int) $predefinedlabels->radioar['yesno'];
-    
+
     return $DB->update_record("predefinedlabels", $data);
 }
 
@@ -104,13 +104,13 @@ function predefinedlabels_update_instance($predefinedlabels) {
 function predefinedlabels_delete_instance($id) {
     global $DB;
 
-    if (! $predefinedlabels = $DB->get_record("predefinedlabels", array("id"=>$id))) {
+    if (!$predefinedlabels = $DB->get_record("predefinedlabels", array("id" => $id))) {
         return false;
     }
 
     $result = true;
 
-    if (! $DB->delete_records("predefinedlabels", array("id"=>$predefinedlabels->id))) {
+    if (!$DB->delete_records("predefinedlabels", array("id" => $predefinedlabels->id))) {
         $result = false;
     }
 
@@ -129,35 +129,47 @@ function predefinedlabels_delete_instance($id) {
  */
 function predefinedlabels_get_coursemodule_info($coursemodule) {
     global $DB;
-    
-    if ($predefinedlabel = $DB->get_record('predefinedlabels', array('id'=>$coursemodule->instance))) {
-        $template = $DB->get_record('predefinedlabels_templates', array('id' => $predefinedlabel->templateid));
-        $info = new cached_cm_info();
-        //$info->content = format_module_intro('predefinedlabels', $predefinedlabels, $coursemodule->id, false);
-        $info->content = $template->body;
-        $info->name  = $template->title;
-        return $info;
-    } else {
-        return null;
-    }
-    
-    /*
-    if ($predefinedlabels = $DB->get_record('predefinedlabels', array('id'=>$coursemodule->instance), 'id, name, templateid')) {
-        if (empty($predefinedlabels->name)) {
-            // predefinedlabels name missing, fix it
-            $predefinedlabels->name = "predefinedlabels{$predefinedlabels->id}";
-            $DB->set_field('predefinedlabels', 'name', $predefinedlabels->name, array('id'=>$predefinedlabels->id));
+    if ($predefinedlabel = $DB->get_record('predefinedlabels', array('id' => $coursemodule->instance))) {
+        if ($template = $DB->get_record('predefinedlabels_templates', array('id' => $predefinedlabel->templateid))) {
+            $info = new cached_cm_info();
+            if ($template->available == 1) {
+                $info->content = $template->body;
+                $info->name = $template->title;
+            }
+            else {
+                $info->content = get_string('not_available', 'mod_predefinedlabels');
+                $info->name = get_string('not_available', 'mod_predefinedlabels');
+            }
+            return $info;
+        } else {
+            // The template this instances uses has been deleted
+            // => delete instance
+            global $CFG;
+            require_once $CFG->dirroot . '/course/lib.php';
+            course_delete_module($coursemodule->id);
+            return null;
         }
-        $info = new cached_cm_info();
-        // no filtering hre because this info is cached and filtered later
-        $info->content = format_module_intro('predefinedlabels', $predefinedlabels, $coursemodule->id, false);
-        $info->name  = $predefinedlabels->name;
-        return $info;
     } else {
         return null;
     }
-     
-    return null;
+
+    /*
+      if ($predefinedlabels = $DB->get_record('predefinedlabels', array('id'=>$coursemodule->instance), 'id, name, templateid')) {
+      if (empty($predefinedlabels->name)) {
+      // predefinedlabels name missing, fix it
+      $predefinedlabels->name = "predefinedlabels{$predefinedlabels->id}";
+      $DB->set_field('predefinedlabels', 'name', $predefinedlabels->name, array('id'=>$predefinedlabels->id));
+      }
+      $info = new cached_cm_info();
+      // no filtering hre because this info is cached and filtered later
+      $info->content = format_module_intro('predefinedlabels', $predefinedlabels, $coursemodule->id, false);
+      $info->name  = $predefinedlabels->name;
+      return $info;
+      } else {
+      return null;
+      }
+
+      return null;
      * 
      */
 }
@@ -193,17 +205,17 @@ function predefinedlabels_get_extra_capabilities() {
  * @return bool|null True if module supports feature, false if not, null if doesn't know
  */
 function predefinedlabels_supports($feature) {
-    switch($feature) {
-        case FEATURE_IDNUMBER:                return false;
-        case FEATURE_GROUPS:                  return false;
-        case FEATURE_GROUPINGS:               return false;
-        case FEATURE_MOD_INTRO:               return true;
+    switch ($feature) {
+        case FEATURE_IDNUMBER: return false;
+        case FEATURE_GROUPS: return false;
+        case FEATURE_GROUPINGS: return false;
+        case FEATURE_MOD_INTRO: return true;
         case FEATURE_COMPLETION_TRACKS_VIEWS: return false;
-        case FEATURE_GRADE_HAS_GRADE:         return false;
-        case FEATURE_GRADE_OUTCOMES:          return false;
-        case FEATURE_MOD_ARCHETYPE:           return MOD_ARCHETYPE_RESOURCE;
-        case FEATURE_BACKUP_MOODLE2:          return true;
-        case FEATURE_NO_VIEW_LINK:            return true;
+        case FEATURE_GRADE_HAS_GRADE: return false;
+        case FEATURE_GRADE_OUTCOMES: return false;
+        case FEATURE_MOD_ARCHETYPE: return MOD_ARCHETYPE_RESOURCE;
+        case FEATURE_BACKUP_MOODLE2: return true;
+        case FEATURE_NO_VIEW_LINK: return true;
 
         default: return null;
     }
@@ -229,8 +241,8 @@ function predefinedlabels_dndupload_register() {
 
     $strdndtext = get_string('dnduploadpredefinedlabelstext', 'mod_predefinedlabels');
     return array_merge($ret, array('types' => array(
-        array('identifier' => 'text/html', 'message' => $strdndtext, 'noname' => true),
-        array('identifier' => 'text', 'message' => $strdndtext, 'noname' => true)
+            array('identifier' => 'text/html', 'message' => $strdndtext, 'noname' => true),
+            array('identifier' => 'text', 'message' => $strdndtext, 'noname' => true)
     )));
 }
 
@@ -266,8 +278,7 @@ function predefinedlabels_dndupload_handle($uploadinfo) {
                 $url = moodle_url::make_draftfile_url($file->get_itemid(), $file->get_filepath(), $file->get_filename());
                 $data->intro = html_writer::link($url, $file->get_filename());
             }
-            $data->intro = file_save_draft_area_files($uploadinfo->draftitemid, $context->id, 'mod_predefinedlabels', 'intro', 0,
-                                                      null, $data->intro);
+            $data->intro = file_save_draft_area_files($uploadinfo->draftitemid, $context->id, 'mod_predefinedlabels', 'intro', 0, null, $data->intro);
         }
     } else if (!empty($uploadinfo->content)) {
         $data->intro = $uploadinfo->content;
@@ -298,11 +309,11 @@ function predefinedlabels_generate_resized_image(stored_file $file, $maxwidth, $
         $width = $imginfo['width'];
         $height = $imginfo['height'];
         if (!empty($maxwidth) && $width > $maxwidth) {
-            $height *= (float)$maxwidth / $width;
+            $height *= (float) $maxwidth / $width;
             $width = $maxwidth;
         }
         if (!empty($maxheight) && $height > $maxheight) {
-            $width *= (float)$maxheight / $height;
+            $width *= (float) $maxheight / $height;
             $height = $maxheight;
         }
 
@@ -313,7 +324,7 @@ function predefinedlabels_generate_resized_image(stored_file $file, $maxwidth, $
         if ($width != $imginfo['width']) {
             $mimetype = $file->get_mimetype();
             if ($mimetype === 'image/gif' or $mimetype === 'image/jpeg' or $mimetype === 'image/png') {
-                require_once($CFG->libdir.'/gdlib.php');
+                require_once($CFG->libdir . '/gdlib.php');
                 $data = $file->generate_image_thumbnail($width, $height);
 
                 if (!empty($data)) {
@@ -321,21 +332,19 @@ function predefinedlabels_generate_resized_image(stored_file $file, $maxwidth, $
                     $record = array(
                         'contextid' => $file->get_contextid(),
                         'component' => $file->get_component(),
-                        'filearea'  => $file->get_filearea(),
-                        'itemid'    => $file->get_itemid(),
-                        'filepath'  => '/',
-                        'filename'  => 's_'.$file->get_filename(),
+                        'filearea' => $file->get_filearea(),
+                        'itemid' => $file->get_itemid(),
+                        'filepath' => '/',
+                        'filename' => 's_' . $file->get_filename(),
                     );
                     $smallfile = $fs->create_file_from_string($record, $data);
 
                     // Replace the image 'src' with the resized file and link to the original
-                    $attrib['src'] = moodle_url::make_draftfile_url($smallfile->get_itemid(), $smallfile->get_filepath(),
-                                                                    $smallfile->get_filename());
+                    $attrib['src'] = moodle_url::make_draftfile_url($smallfile->get_itemid(), $smallfile->get_filepath(), $smallfile->get_filename());
                     $link = $fullurl;
                 }
             }
         }
-
     } else {
         // Assume this is an image type that get_imageinfo cannot handle (e.g. SVG)
         $attrib['width'] = $maxwidth;

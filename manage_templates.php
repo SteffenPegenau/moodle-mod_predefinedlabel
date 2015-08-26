@@ -2,8 +2,9 @@
 
 require_once '../../config.php';
 require_once __DIR__ . '/add_template_form.php';
-global $CFG, $PAGE, $OUTPUT, $DB, $USER;
 
+
+global $CFG, $PAGE, $OUTPUT, $DB, $USER;
 require_once($CFG->libdir . '/adminlib.php');
 admin_externalpage_setup('modpredefinedlabels_managetemplates', '', null, '/mod/predefinedtemplates/manage_templates.php');
 
@@ -17,6 +18,26 @@ if (!empty($_REQUEST)) {
         deleteTemplate($_REQUEST);
     }
 }
+
+// Process new template
+$mform = new add_template_form();
+if ($mform->is_cancelled()) {
+    //Handle form cancel operation, if cancel button is present on form
+} else if ($formdata = $mform->get_data()) {
+    $data = array();
+    $data["title"] = $formdata->title;
+    $data["body"] = $formdata->body['text'];
+    $data["timecreated"] = time();
+    $data["timemodified"] = time();
+    $data["userid"] = (int) $USER->id;
+    $data["available"] = (int) $formdata->available;
+    $id = $DB->insert_record_raw('predefinedlabels_templates', $data, true);
+    redirect($_SERVER['REQUEST_URI']);
+}
+
+
+
+
 
 
 
@@ -52,27 +73,10 @@ if (count($templates) == 0) {
 echo "<h3>" . get_string('add_template', 'mod_predefinedlabels') . "</h3>";
 
 
-$mform = new add_template_form();
-//Form processing and displaying is done here
-if ($mform->is_cancelled()) {
-    //Handle form cancel operation, if cancel button is present on form
-} else if ($formdata = $mform->get_data()) {
-    $data = array();
-    $data["title"] = $formdata->title;
-    $data["body"] = $formdata->body['text'];
-    $data["timecreated"] = time();
-    $data["timemodified"] = time();
-    $data["userid"] = (int) $USER->id;
-    $data["available"] = (int) $formdata->available;
-    $id = $DB->insert_record_raw('predefinedlabels_templates', $data, true);
-    redirect($_SERVER['REQUEST_URI']);
-} else {
-    // this branch is executed if the form is submitted but the data doesn't validate and the form should be redisplayed
-    // or on the first display of the form.
-    //displays the form
-    $mform->display();
-}
 
+//Form processing and displaying is done here
+
+$mform->display();
 echo $OUTPUT->footer();
 
 function printArray($data) {
@@ -118,8 +122,17 @@ function changeTemplate($data) {
     $updatedData->available = $data['available' . $id];
     $DB->update_record("predefinedlabels_templates", $updatedData);
     
-    // Rebuild course cache for all courses that use this template
-    $courses = $DB->get_records('predefinedlabels', array("templateid" => $id), null, 'course');
+    rebuildCourseCache($id);
+}
+
+/**
+ * Rebuild course cache in all courses that use the template
+ * 
+ * @param int $templateid
+ */
+function rebuildCourseCache($templateid) {
+    GLOBAL $DB;
+     $courses = $DB->get_records('predefinedlabels', array("templateid" => $templateid), null, 'course');
     
     foreach ($courses as $courseid => $course) {
         rebuild_course_cache($courseid);
@@ -129,7 +142,9 @@ function changeTemplate($data) {
 function deleteTemplate($data) {
     $id = getIDbyREQUESTData($data);
     global $DB;
-    $DB->delete_records("predefinedlabels_templates", array("id" => $id)); 
+    $DB->delete_records("predefinedlabels_templates", array("id" => $id));
+    
+    rebuildCourseCache($id);
 }
 
 function hasKeyLike($array, $pattern) {
