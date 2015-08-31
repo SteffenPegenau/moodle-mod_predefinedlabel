@@ -1,3 +1,4 @@
+
 <?php
 
 require_once("$CFG->libdir/formslib.php");
@@ -14,7 +15,7 @@ class add_template_form extends moodleform {
         $mform->addElement('editor', 'body', get_string('content'));
         $mform->addElement('selectyesno', 'available', get_string('available', 'mod_predefinedlabels'));
         
-        $mform->addElement('submit', 'submitbutton', get_string('create_new_template', 'mod_predefinedlabels'));
+        $mform->addElement('submit', 'submitbutton', get_string('savechanges'));
     //Custom validation should be added here
     }
     function validation($data, $files) {

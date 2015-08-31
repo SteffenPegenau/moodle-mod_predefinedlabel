@@ -29,8 +29,7 @@ require_once ($CFG->dirroot . '/course/moodleform_mod.php');
 class mod_predefinedlabels_mod_form extends moodleform_mod {
 
     function definition() {
-        GLOBAL $DB, $PAGE, $COURSE;
-
+        GLOBAL $DB;
         $mform = $this->_form;
 
         $templates = $DB->get_records('predefinedlabels_templates', array('available' => 1));
