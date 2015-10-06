@@ -62,13 +62,20 @@ function get_predefinedlabels_name($predefinedlabels) {
 function predefinedlabels_add_instance($predefinedlabels) {
     global $DB;
     //echo "<pre>".print_r($predefinedlabels, true)."</pre>";
-
+    try {
     $data = new stdClass();
     $data->course = $predefinedlabels->course;
     $data->timemodified = time();
-    $data->templateid = (int) $predefinedlabels->radioar['yesno'];
+    $data->templateid = (int) $predefinedlabels->radioarr['radioarr'];
 
     return $DB->insert_record("predefinedlabels", $data);
+    } catch (Exception $e) {
+        echo $e;
+        echo "predefinedlabels:<br />";
+        echo "<pre>".print_r($predefinedlabels, true)."</pre>";
+        echo "data:<br />";
+        echo "<pre>".print_r($data, true)."</pre>";
+    }
 }
 
 /**

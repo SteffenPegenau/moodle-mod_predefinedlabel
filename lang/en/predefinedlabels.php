@@ -58,3 +58,5 @@ $string['title'] = 'Title:';
 $string['timecreated'] = 'Created:';
 $string['please_chose_template'] = 'Please choose a template';
 $string['not_available'] = 'This template was deactivated by administration';
+$string['create_new_template'] = 'Create new template';
+$string['error_no_templates'] = 'No templates available';
