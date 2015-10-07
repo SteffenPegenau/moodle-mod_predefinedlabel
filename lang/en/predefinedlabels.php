@@ -23,40 +23,26 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['configdndmedia'] = 'Offer to create a predefinedlabels when media files are dragged & dropped onto a course';
-$string['configdndresizeheight'] = 'When a predefinedlabels is created from a dragged & dropped image, resize it if it is higher than this many pixels (0 for no resize)';
-$string['configdndresizewidth'] = 'When a predefinedlabels is created from a dragged & dropped image, resize it if it is wider than this many pixels (0 for no resize)';
-$string['dndmedia'] = 'Media drag and drop';
-$string['dndresizeheight'] = 'Resize drag and drop height';
-$string['dndresizewidth'] = 'Resize drag and drop width';
-$string['dnduploadpredefinedlabels'] = 'Add image to course page';
-$string['dnduploadpredefinedlabelstext'] = 'Add a predefinedlabels to the course page';
 $string['predefinedlabels:addinstance'] = 'Add a new predefinedlabels';
 $string['predefinedlabelstext'] = 'Label text';
 $string['modulename'] = 'Predefined Label';
-$string['modulename_help'] = 'The predefinedlabels module enables text and multimedia to be inserted into the course page in between links to other resources and activities. Labels are very versatile and can help to improve the appearance of a course if used thoughtfully.
-
-Labels may be used
-
-* To split up a long list of activities with a subheading or an image
-* To display an embedded sound file or video directly on the course page
-* To add a short description to a course section';
+$string['modulename_help'] = 'With this plugin you can add predefined texts to your course.';
 $string['modulename_link'] = 'mod/predefinedlabels/view';
 $string['modulenameplural'] = 'Predefined Labels';
 $string['pluginadministration'] = 'Predefined Label administration';
 $string['pluginname'] = 'Predefined Label';
 
 $string['manage_templates'] = 'Manage Templates';
-$string['settings_templates_header'] = 'Manage Templates - Heading';
-$string['settings_templates_header_information'] = 'Manage Templates - Information Text';
+//$string['settings_templates_header'] = 'Manage Templates - Heading';
+//$string['settings_templates_header_information'] = 'Manage Templates - Information Text';
 $string['plugin_settings'] = 'Plugin Settings';
 $string['no_templates'] = 'No templates to show';
 $string['add_template'] = 'Add new template';
-$string['templates'] = 'Templates:';
+$string['templates'] = 'Existing templates';
 $string['available'] = 'Available?';
 $string['title'] = 'Title:';
 $string['timecreated'] = 'Created:';
 $string['please_chose_template'] = 'Please choose a template';
-$string['not_available'] = 'This template was deactivated by administration';
+$string['not_available'] = 'This template was deactivated by administration. <br />After reactivation this activity will become visible again.';
 $string['create_new_template'] = 'Create new template';
 $string['error_no_templates'] = 'No templates available';

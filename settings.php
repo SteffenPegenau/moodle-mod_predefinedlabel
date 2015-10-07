@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die;
 $ADMIN->add('modsettings', new admin_category('modpredefinedlabelsfolder', new lang_string('pluginname', 'mod_predefinedlabels'), $module->is_enabled() === false));
 
 $settings = new admin_settingpage($section, get_string('plugin_settings', 'mod_predefinedlabels'), 'moodle/site:config', $module->is_enabled() === false);
-
+/*
 if ($ADMIN->fulltree) {
  
     $settings->add(new admin_setting_configcheckbox('predefinedlabels/dndmedia',
@@ -45,7 +45,7 @@ $ADMIN->add('modpredefinedlabelsfolder', $settings);
 // Tell core we already added the settings structure.
 $settings = null;
 
-    
+*/  
 $template_manager = new admin_externalpage('modpredefinedlabels_managetemplates', get_string('manage_templates', 'mod_predefinedlabels'), '/mod/predefinedlabels/manage_templates.php', 'moodle/site:config', $module->is_enabled() === false);   
 //$template_manager =  new admin_settingpage('modpredefinedlabels_managetemplates', get_string('manage_templates', 'mod_predefinedlabels'), 'moodle/site:config', $module->is_enabled() === false);
 //$template_manager->add(new admin_setting_heading('templates', get_string('settings_templates_header', 'mod_predefinedlabels'), get_string('settings_templates_header_information', 'mod_predefinedlabels')));
