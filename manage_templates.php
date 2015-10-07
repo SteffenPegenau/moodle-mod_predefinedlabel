@@ -114,16 +114,73 @@ function displayChangeTemplateForm($template) {
 function changeTemplate($data) {
     $id = getIDbyREQUESTData($data);
     global $USER, $DB;
-    $updatedData = new stdClass();
-    $updatedData->id = $id;
-    $updatedData->title = $data['title' . $id];
-    $updatedData->body = $data['body' . $id]['text'];
-    $updatedData->timemodified = time();
-    $updatedData->userid = $USER->id;
-    $updatedData->available = $data['available' . $id];
-    $DB->update_record("predefinedlabels_templates", $updatedData);
     
+    $new_availability = $data['available' . $id];
+    $db_rec = $DB->get_record('predefinedlabels_templates', array('id' => $id), '*', MUST_EXIST);
+    
+    availabilityManager($db_rec, $new_availability);
+    
+    $db_rec->title = $data['title' . $id];
+    $db_rec->body = $data['body' . $id]['text'];
+    $db_rec->timemodified = time();
+    $db_rec->userid = $USER->id;
+    $db_rec->available = $new_availability;
+    $DB->update_record("predefinedlabels_templates", $db_rec);
+        
     rebuildCourseCache($id);
+}
+
+/**
+ * Checks the old and the new availability of the template and adapts the visibility of all using mod instances
+ * 
+ * @param type $data A single DB-record out of 'predefinedlabels_templates', Containing the data before change
+ * @param type $new_availability 1 if new visibility is set to true, else: 0
+ */
+function availabilityManager($data, $new_availability) {
+    // invisible before, invisible after => nothing to do
+    
+    // invisible before, visible after
+    if ($data->available == 0 && $new_availability == 1) {
+        // Set the visibility of all instances that use this template to 1 (not visible)
+        changeVisibilityOfAllModInstancesOfTemplate($data->id, 1);        
+    }
+    // Visible before, invisible after
+    else if ($data->available == 1 && $new_availability == 0) {
+        // Set the visibility of all instances that use this template to 0 (not visible)
+        changeVisibilityOfAllModInstancesOfTemplate($data->id, 0);     
+    }
+    
+    // Visible before, visible after => nothing to do
+}
+
+/**
+ * Changes visibility of all mod instances that use the template with $id to $visibility
+ * 
+ * @param int $id template-ID 
+ * @param int $visibility 0(for invisible) or 1 (for visible)
+ */
+function changeVisibilityOfAllModInstancesOfTemplate($templateid, $visibility) {
+    global $DB;
+    $sql = "
+        UPDATE 
+            {course_modules}
+        SET 
+            {course_modules}.visible = ".$visibility."
+        WHERE
+            {course_modules}.id IN 
+            (
+                SELECT {course_modules}.id 
+                FROM
+                        {course_modules},
+                        {modules},
+                        {predefinedlabels}
+                WHERE
+                        {course_modules}.instance = {predefinedlabels}.id AND
+                        {predefinedlabels}.templateid = ".$templateid." AND
+                        {course_modules}.module = {modules}.id AND
+                        {modules}.name = 'predefinedlabels'
+            )";
+    $DB->execute($sql);
 }
 
 /**
@@ -133,10 +190,10 @@ function changeTemplate($data) {
  */
 function rebuildCourseCache($templateid) {
     GLOBAL $DB;
-     $courses = $DB->get_records('predefinedlabels', array("templateid" => $templateid), null, 'course');
+     $courses = $DB->get_records('predefinedlabels', array("templateid" => $templateid), null, 'id, course');
     
-    foreach ($courses as $courseid => $course) {
-        rebuild_course_cache($courseid);
+    foreach ($courses as $id => $rec) {
+        rebuild_course_cache($rec->course);
     }
 }
 
