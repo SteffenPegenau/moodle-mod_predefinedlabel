@@ -7,6 +7,12 @@ require_once __DIR__ . '/add_template_form.php';
 
 global $CFG, $PAGE, $OUTPUT, $DB, $USER;
 require_once($CFG->libdir . '/adminlib.php');
+
+$context = context_system::instance();
+        
+require_capability('mod/predefinedlabels:managetemplates', $context);
+
+
 admin_externalpage_setup('modpredefinedlabels_managetemplates', '', null, '/mod/predefinedtemplates/manage_templates.php');
 
 // Process changes or deletions
